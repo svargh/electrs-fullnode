@@ -1,0 +1,67 @@
+services:
+  bitcoind:
+    container_name: bitcoind
+    build:
+      context: ./bitcoind
+      args:
+        BUILD_BITCOINCORE_VERSION: ${BUILD_BITCOINCORE_VERSION}
+        BUILD_BITCOIN_CORE_SIGNATURE: ${BUILD_BITCOIN_CORE_SIGNATURE}
+
+    working_dir: /home/user01
+    user: user01
+    volumes:
+      - ${HOST_SERVER_DIR}/bitcoind:/home/user01/.bitcoin:rw
+      - ./bitcoind/bitcoin.conf:/home/user01/.bitcoin/bitcoin.conf:rw
+    stdin_open: true
+    tty: true
+    #entrypoint: ["/opt/bitcoin/bin/test_bitcoin --show_progress && top"]
+    command:
+      - /bin/sh
+      - -c
+      - |
+        top
+#       /opt/bitcoin/bin/test_bitcoin --show_progress && top
+
+#  electrs:
+#    container_name: electrs
+#    build: 
+#      context: .
+#      dockerfile: Dockerfile-electrs
+#      args: 
+#        VERSION: "v0.10.1" #electrs version
+#    volumes:
+#      - ./config.toml:/data/.electrs/config.toml
+#      - ./electrs-data:/electrs/data
+#    restart: always
+#    # ports:
+#      # Port 50001 does not have to be exposed to the host when using nginx reverse proxy for SSL connection
+#      # - 50001:50001 #Mainnet RPC
+#    depends_on:
+#      - bitcoind    
+
+# nginx:
+#   container_name: electrs-nginx
+#   image: nginx:latest
+#   restart: always
+#   ports:
+#       - "50002:50002"
+#   volumes:
+#       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+#       - ./nginx/conf.stream.d/electrs.conf:/etc/nginx/conf.stream.d/electrs.conf 
+#       - ./cert.crt:/nginx/cert.crt
+#       - ./cert.key:/nginx/cert.key
+#   depends_on:
+#     - electrs    
+# internetrouter:
+#   container_name: internetrouter
+#   build: 
+#     context: .
+#     dockerfile: Dockerfile-internetrouter
+#   volumes:
+#     - ./openvpn.conf:/data/.openvpn/openvpn.confg
+
+#networks:
+#  default:
+#    name: electrum-fullnode
+#    external: true
+#
