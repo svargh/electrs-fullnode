@@ -1,12 +1,16 @@
+networks:
+  mynetwork:
+    driver: bridge
 services:
   bitcoind:
-    container_name: bitcoind
+    restart: always
+    networks:
+      - mynetwork
     build:
       context: ./bitcoind
       args:
         BUILD_BITCOINCORE_VERSION: ${BUILD_BITCOINCORE_VERSION}
         BUILD_BITCOIN_CORE_SIGNATURE: ${BUILD_BITCOIN_CORE_SIGNATURE}
-
     working_dir: /home/user01
     user: user01
     volumes:
@@ -14,54 +18,64 @@ services:
       - ./bitcoind/bitcoin.conf:/home/user01/.bitcoin/bitcoin.conf:rw
     stdin_open: true
     tty: true
-    #entrypoint: ["/opt/bitcoin/bin/test_bitcoin --show_progress && top"]
     command:
       - /bin/sh
       - -c
       - |
-        top
-#       /opt/bitcoin/bin/test_bitcoin --show_progress && top
+        /opt/bitcoin/bin/bitcoind
+  #         sleep 10000
+  #         top
+  #         /opt/bitcoin/bin/test_bitcoin --show_progress && top
 
-#  electrs:
-#    container_name: electrs
-#    build: 
-#      context: .
-#      dockerfile: Dockerfile-electrs
-#      args: 
-#        VERSION: "v0.10.1" #electrs version
-#    volumes:
-#      - ./config.toml:/data/.electrs/config.toml
-#      - ./electrs-data:/electrs/data
-#    restart: always
-#    # ports:
-#      # Port 50001 does not have to be exposed to the host when using nginx reverse proxy for SSL connection
-#      # - 50001:50001 #Mainnet RPC
-#    depends_on:
-#      - bitcoind    
+  electrs:
+    networks:
+      - mynetwork
+    build:
+      context: ./electrs
+      args:
+        BUILD_ELECTRS_VERSION: ${BUILD_ELECTRS_VERSION}
+    volumes:
+      - ${HOST_SERVER_DIR}/bitcoind:/home/user01/.bitcoin
+      - ${HOST_SERVER_DIR}/electrs-data:/home/user01/electrs-data
+      - ./electrs/electrs-config.toml:/home/user01/electrs-config.toml
+    healthcheck:
+      timeout: 10s
+    restart: always
+    stdin_open: true
+    tty: true
+    working_dir: /home/user01/electrs-data
+    command: >
+      sh -c "electrs --conf /home/user01/electrs-config.toml"
+    depends_on:
+      - bitcoind
 
-# nginx:
-#   container_name: electrs-nginx
-#   image: nginx:latest
-#   restart: always
-#   ports:
-#       - "50002:50002"
-#   volumes:
-#       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-#       - ./nginx/conf.stream.d/electrs.conf:/etc/nginx/conf.stream.d/electrs.conf 
-#       - ./cert.crt:/nginx/cert.crt
-#       - ./cert.key:/nginx/cert.key
-#   depends_on:
-#     - electrs    
-# internetrouter:
+  nginx:
+    networks:
+      - mynetwork
+    build:
+      context: ./nginx
+    # restart: always
+    ports:
+      - "50002:50002"
+      - "50003:50003"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/site-default:/etc/nginx/sites-enabled/default
+      - ./nginx/electrs-reverse-proxy.conf:/etc/nginx/streams-enabled/electrs-reverse-proxy.conf
+      - ./nginx/files-runtime:/home/user01/files-runtime
+      - ./nginx/start.sh:/home/user01/start.sh
+    #     - ./cert.crt:/nginx/cert.crt
+    #      - ./cert.key:/nginx/cert.key
+    command: sh -c "chmod +x /home/user01/start.sh && /home/user01/start.sh"
+
+#  blockexplorer:
+#  rdpserver:
+#
+
+# privacy-router:
 #   container_name: internetrouter
 #   build: 
 #     context: .
 #     dockerfile: Dockerfile-internetrouter
 #   volumes:
 #     - ./openvpn.conf:/data/.openvpn/openvpn.confg
-
-#networks:
-#  default:
-#    name: electrum-fullnode
-#    external: true
-#

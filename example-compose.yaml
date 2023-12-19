@@ -146,7 +146,7 @@ services:
 ########### optional ##############
   # nginx
   nginx:
-   container_name: nginx_guacamole_compose
+   container_name: nginx
    restart: always
    image: nginx
    volumes:
@@ -154,7 +154,7 @@ services:
    - ./nginx/ssl/self.cert:/etc/nginx/ssl/self.cert:ro
    - ./nginx/ssl/self-ssl.key:/etc/nginx/ssl/self-ssl.key:ro
    ports:
-   - 8443:443
+   - 50002:443
    links:
    - guacamole
    networks:
