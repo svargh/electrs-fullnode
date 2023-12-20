@@ -2,9 +2,15 @@
 
 source .env
 
-#echo "Going to reset permissions in ${HOST_SERVER_DIR}/. Press any key to continue."
-#read
-#hmod 777 -R ${HOST_SERVER_DIR}/*
+echo "Your bitcoinserver-datadir is: ${PERSISTENT_DATA_DIR}"
 
-docker compose up --build --force-recreate --remove-orphans
-#docker compose up
+chmod 777 ${PERSISTENT_DATA_DIR}
+chown 1011:1011 ${PERSISTENT_DATA_DIR}
+chmod g+s ${PERSISTENT_DATA_DIR}
+
+#chmod 777 -R /mnt/shareddata-tmp-dev-company/bitcoinserver-data/*
+#chown 1011:1011 -R /mnt/shareddata-tmp-dev-company/bitcoinserver-data/*
+#exit
+
+#docker compose up --build --force-recreate --remove-orphans
+docker compose up

@@ -14,18 +14,11 @@ services:
     working_dir: /home/user01
     user: user01
     volumes:
-      - ${HOST_SERVER_DIR}/bitcoind:/home/user01/.bitcoin:rw
+      - ${PERSISTENT_DATA_DIR}/bitcoind:/home/user01/.bitcoin:rw
       - ./bitcoind/bitcoin.conf:/home/user01/.bitcoin/bitcoin.conf:rw
     stdin_open: true
     tty: true
-    command:
-      - /bin/sh
-      - -c
-      - |
-        /opt/bitcoin/bin/bitcoind
-  #         sleep 10000
-  #         top
-  #         /opt/bitcoin/bin/test_bitcoin --show_progress && top
+    command: sh -c "/opt/bitcoin/bin/bitcoind"
 
   electrs:
     networks:
@@ -35,17 +28,17 @@ services:
       args:
         BUILD_ELECTRS_VERSION: ${BUILD_ELECTRS_VERSION}
     volumes:
-      - ${HOST_SERVER_DIR}/bitcoind:/home/user01/.bitcoin
-      - ${HOST_SERVER_DIR}/electrs-data:/home/user01/electrs-data
+      - ${PERSISTENT_DATA_DIR}/bitcoind:/home/user01/.bitcoin
+      - ${PERSISTENT_DATA_DIR}/electrs-data:/home/user01/electrs-data
       - ./electrs/electrs-config.toml:/home/user01/electrs-config.toml
     healthcheck:
-      timeout: 10s
+      timeout: 60s
     restart: always
     stdin_open: true
     tty: true
     working_dir: /home/user01/electrs-data
-    command: >
-      sh -c "electrs --conf /home/user01/electrs-config.toml"
+    command: sh -c "electrs --conf /home/user01/electrs-config.toml"
+    #command: sh -c "electrs --conf /home/user01/electrs-config.toml; tail -F somethingToKeepOpen"
     depends_on:
       - bitcoind
 
@@ -64,13 +57,15 @@ services:
       - ./nginx/electrs-reverse-proxy.conf:/etc/nginx/streams-enabled/electrs-reverse-proxy.conf
       - ./nginx/files-runtime:/home/user01/files-runtime
       - ./nginx/start.sh:/home/user01/start.sh
-    #     - ./cert.crt:/nginx/cert.crt
-    #      - ./cert.key:/nginx/cert.key
     command: sh -c "chmod +x /home/user01/start.sh && /home/user01/start.sh"
-
-#  blockexplorer:
-#  rdpserver:
-#
+    healthcheck:
+      timeout: 60s
+    restart: always
+# blockexplorer:
+#   networks:
+#     - mynetwork
+#   build:
+#     context: ./blockexplorer
 
 # privacy-router:
 #   container_name: internetrouter
@@ -79,3 +74,12 @@ services:
 #     dockerfile: Dockerfile-internetrouter
 #   volumes:
 #     - ./openvpn.conf:/data/.openvpn/openvpn.confg
+
+# rdpserver:
+#   networks:
+#     - mynetwork
+#   build:
+#     context: ./rdpserver
+#   # restart: always
+#   ports:
+#     - "13389:3389"
