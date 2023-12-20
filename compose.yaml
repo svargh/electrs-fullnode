@@ -39,8 +39,6 @@ services:
     working_dir: /home/user01/electrs-data
     command: sh -c "electrs --conf /home/user01/electrs-config.toml"
     #command: sh -c "electrs --conf /home/user01/electrs-config.toml; tail -F somethingToKeepOpen"
-    depends_on:
-      - bitcoind
 
   nginx:
     networks:
@@ -61,11 +59,27 @@ services:
     healthcheck:
       timeout: 60s
     restart: always
-# blockexplorer:
-#   networks:
-#     - mynetwork
-#   build:
-#     context: ./blockexplorer
+
+  btc-rpc-explorer:
+    networks:
+      - mynetwork
+    image: svdkrgsfa/btc-rpc-explorer:latest
+    volumes:
+      - ${PERSISTENT_DATA_DIR}/bitcoind/.cookie:/tmp/.cookie
+    environment:
+      BTCEXP_HOST: 0.0.0.0
+      BTCEXP_PORT: 3012
+      BTCEXP_BITCOIND_HOST: bitcoind
+      BTCEXP_BITCOIND_PORT: 29123
+      BTCEXP_BITCOIND_COOKIE: /tmp/.cookie
+      BTCEXP_SLOW_DEVICE_MODE: false
+      BTCEXP_PRIVACY_MODE: false
+      BTCEXP_NO_RATES: false
+      BTCEXP_UI_THEME: dark
+      BTCEXP_ADDRESS_API: electrum
+      BTCEXP_ELECTRUM_SERVERS: tcp://electrs:50001
+    ports:
+      - "3012:3012"
 
 # privacy-router:
 #   container_name: internetrouter

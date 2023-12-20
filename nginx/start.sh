@@ -15,7 +15,6 @@ fi
 cp ${CERTS_DIR}/nginx-selfsigned.key /etc/ssl/private/nginx-selfsigned.key
 cp ${CERTS_DIR}/nginx-selfsigned.crt /etc/ssl/certs/nginx-selfsigned.crt
 
-echo "Hallo2"
-
+echo "Starting nginx"
 nginx -g "daemon off;"
-tail -F somethingToKeepOpen
+#tail -F somethingToKeepOpen
