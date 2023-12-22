@@ -44,3 +44,5 @@ Ideally only the .env file can be editing, if needed
 - Use always start.sh script
 - Check if +x is needed, or just sh is needed
 - docker-compose.override.yaml for disabled unwanted services
+- replace /etc/ssl path with /home/user01/files-runtime/certs, then remove cp instruction
+- - start electrs with: --index-lookup-limit: btc-rpc-explorer complaining showing not all transaciotn histories

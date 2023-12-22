@@ -76,7 +76,10 @@ services:
       BTCEXP_PRIVACY_MODE: false
       BTCEXP_NO_RATES: false
       BTCEXP_UI_THEME: dark
+
+      #BTCEXP_ADDRESS_API: blockchain.com
       BTCEXP_ADDRESS_API: electrum
+      BTCEXP_ELECTRUM_TXINDEX: true
       BTCEXP_ELECTRUM_SERVERS: tcp://electrs:50001
     ports:
       - "3012:3012"
