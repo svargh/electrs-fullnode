@@ -1,3 +1,4 @@
 /.idea/*
 /nginx/files-runtime/certs/nginx-selfsigned.crt
 /nginx/files-runtime/certs/nginx-selfsigned.key
+/nginx/files-runtime/dhparam.pem
