@@ -66,8 +66,11 @@ services:
     image: svdkrgsfa/btc-rpc-explorer:latest
     volumes:
       - ${PERSISTENT_DATA_DIR}/bitcoind/.cookie:/tmp/.cookie
-    #ports:
-    #  - "3012:3012"
+    restart: always
+    healthcheck:
+      # Misusing for restarting own container
+      test: wget -T 10 -qO- http://localhost:3012/btcexplorer/api/blocks/tip | grep height || pkill node
+      interval: 60s
     environment:
       BTCEXP_BASEURL: /btcexplorer/
       BTCEXP_HOST: 0.0.0.0
@@ -84,10 +87,9 @@ services:
       BTCEXP_ADDRESS_API: electrum
       BTCEXP_ELECTRUM_TXINDEX: true
       BTCEXP_ELECTRUM_SERVERS: tcp://electrs:50001
-    #Exposing only for troubleshooting, port exposed in nginx service
 
-# privacy-router:
-#   container_name: internetrouter
+# router:
+#   container_name: outer
 #   build: 
 #     context: .
 #     dockerfile: Dockerfile-internetrouter

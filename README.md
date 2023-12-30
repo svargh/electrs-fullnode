@@ -20,13 +20,15 @@ This project contains mainly preconfigured electrs, bitcoind and nginx server fo
 - To change defaults, adjust .env file
 
 # Hint
-Thanks and Credits go to the proejcts listed in References section below
+- Thanks and Credits go to the proejcts listed in References section below
 This project aims to put everything in one central directory, 
 and to start without any manual internevtion as possible.
 Ideally only the .env file can be editing, if needed
 
 
 - apt update; apt install -y inetutils-ping netcat; nc -zvw10 bitcoind 29123
+
+- Extreme slow bitcoind RPC response: High IO on HDD using other apps, check iotop!
 
 # References
 - How to use nginx ssl reverse proxy: https://raspibolt.org/guide/bitcoin/electrum-server.html#firewall--reverse-proxy
