@@ -56,7 +56,6 @@ Idealy only the .env file can be editing, if needed.
 
 
 
-
 # References
 - How to use nginx ssl reverse proxy: https://raspibolt.org/guide/bitcoin/electrum-server.html#firewall--reverse-proxy
 - Based on mu373 work for running electrs and bitcoind: https://github.com/mu373
