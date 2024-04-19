@@ -19,16 +19,42 @@ This project contains mainly preconfigured electrs, bitcoind and nginx server fo
 - Connect with SSL: /electrum.AppImage --oneserver --server localhost:50002:s
 - To change defaults, adjust .env file
 
-# Hint
-- Thanks and Credits go to the proejcts listed in References section below
+
+# Credits
+
+Thanks and Credits go to the projects listed in References section below.
 This project aims to put everything in one central directory, 
-and to start without any manual internevtion as possible.
-Ideally only the .env file can be editing, if needed
+and to start without any manual configuration as possible.
+Idealy only the .env file can be editing, if needed.
 
 
-- apt update; apt install -y inetutils-ping netcat; nc -zvw10 bitcoind 29123
+# Troubleshooting
+- My notes references: DO-A-25/bitcoinserver
+- Check electrs reachable:
 
-- Extreme slow bitcoind RPC response: High IO on HDD using other apps, check iotop!
+
+    docker exec -it -u root bitcoinserver-electrs-1 bash
+    root@9b46deacc619:/home/user01/electrs-data# echo '{"jsonrpc": "2.0", "method": "server.version", "id": 0, "params": ["electrum/3.3.8", "1.4"]}' | nc 127.0.0.1 50001
+    {"id":0,"jsonrpc":"2.0","result":["electrs/0.10.1","1.4"]}
+
+
+- ChecK SSL proxy is working(manual) at host or in nginx service 
+  Electrum reachable on its port 50001, but not reachable on ssl proxy from nginx service:apt update;
+
+
+    echo '{"jsonrpc": "2.0", "method": "server.version", "id": 0, "params": ["electrum/3.3.8", "1.4"]}' | openssl s_client -connect localhost:50002 -ign_eof
+
+
+  Manual cancel needed for this command.
+  Solution: Restart nginx service.
+
+- Extreme slow bitcoind RPC response: High IO on HDD from other apps, check iotop!
+- terminal electrs server: 
+  
+
+    docker exec -it -u root bitcoinserver-electrs-1 bash
+
+
 
 # References
 - How to use nginx ssl reverse proxy: https://raspibolt.org/guide/bitcoin/electrum-server.html#firewall--reverse-proxy
